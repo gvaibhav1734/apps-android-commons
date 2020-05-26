@@ -160,8 +160,8 @@ public class BookmarkLocationsDao {
                 location,
                 cursor.getString(cursor.getColumnIndex(Table.COLUMN_CATEGORY)),
                 builder.build(),
-                null,
-                null
+                cursor.getString(cursor.getColumnIndex(Table.COLUMN_PIC)),
+                cursor.getString(cursor.getColumnIndex(Table.COLUMN_DESTROYED))
         );
         // TODO: add pic and destroyed to bookmark location dao
     }
@@ -179,6 +179,7 @@ public class BookmarkLocationsDao {
         cv.put(BookmarkLocationsDao.Table.COLUMN_LAT, bookmarkLocation.location.getLatitude());
         cv.put(BookmarkLocationsDao.Table.COLUMN_LONG, bookmarkLocation.location.getLongitude());
         cv.put(BookmarkLocationsDao.Table.COLUMN_PIC, bookmarkLocation.pic);
+        cv.put(BookmarkLocationsDao.Table.COLUMN_DESTROYED, bookmarkLocation.destroyed);
         return cv;
     }
 
@@ -197,6 +198,7 @@ public class BookmarkLocationsDao {
         static final String COLUMN_WIKIDATA_LINK = "location_wikidata_link";
         static final String COLUMN_COMMONS_LINK = "location_commons_link";
         static final String COLUMN_PIC = "location_pic";
+        static final String COLUMN_DESTROYED = "location_destroyed";
 
         // NOTE! KEEP IN SAME ORDER AS THEY ARE DEFINED UP THERE. HELPS HARD CODE COLUMN INDICES.
         public static final String[] ALL_FIELDS = {
@@ -211,7 +213,8 @@ public class BookmarkLocationsDao {
                 COLUMN_WIKIPEDIA_LINK,
                 COLUMN_WIKIDATA_LINK,
                 COLUMN_COMMONS_LINK,
-                COLUMN_PIC
+                COLUMN_PIC,
+                COLUMN_DESTROYED
         };
 
         static final String DROP_TABLE_STATEMENT = "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -228,7 +231,8 @@ public class BookmarkLocationsDao {
                 + COLUMN_WIKIPEDIA_LINK + " STRING,"
                 + COLUMN_WIKIDATA_LINK + " STRING,"
                 + COLUMN_COMMONS_LINK + " STRING,"
-                + COLUMN_PIC + " STRING"
+                + COLUMN_PIC + " STRING,"
+                + COLUMN_DESTROYED + " STRING"
                 + ");";
 
         public static void onCreate(SQLiteDatabase db) {
@@ -269,6 +273,15 @@ public class BookmarkLocationsDao {
                 //We are anyways switching to room, these things won't be nescessary then
                 try {
                     db.execSQL("ALTER TABLE bookmarksLocations ADD COLUMN location_pic STRING;");
+                }catch (SQLiteException exception){
+                    Timber.e(exception);//
+                }
+                return;
+            }
+            if (from == 12 && to == 13) {
+                from++;
+                try {
+                    db.execSQL("ALTER TABLE bookmarksLocations ADD COLUMN location_destroyed STRING;");
                 }catch (SQLiteException exception){
                     Timber.e(exception);//
                 }
